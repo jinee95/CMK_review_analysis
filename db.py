@@ -139,7 +139,7 @@ def TB_CRAW_top5_pid():
 def TB_review_part_id(part_id_list):
     print('db_data_loading')
     try:
-        conn=conn_cp949()
+        conn=conn_utf8()
         df_concat=pd.DataFrame()
         for part_id in part_id_list:
             cursor=conn.cursor()
@@ -226,13 +226,14 @@ def anal00_part_id():
 def TB_join(df):
     print('db_data_loading for keyword/sentence')
     try:
-        conn=conn_cp949()
-        cursor = conn.cursor()
         review_col_name=["SITE_GUBUN","PART_GROUP_ID","PART_SUB_ID","PART_ID","REVIEW_DOC_NO","REVIEW"]
         df_review_concat=pd.DataFrame(columns=review_col_name)
         anal00_col_name=["REVIEW_DOC_NO","PART_ID","RLT_VALUE_03"]
         anal00_concat=pd.DataFrame(columns=anal00_col_name)
-        for i,part in df.iterrows:
+        conn=conn_cp949()
+        cursor = conn.cursor()
+
+        for i,part in df.iterrows():
             sql1="select SITE_GUBUN, PART_GROUP_ID, PART_SUB_ID, PART_ID, REVIEW_DOC_NO, REVIEW from TB_REVIEW (nolock) where PART_SUB_ID=%s and PART_ID=%s"
             cursor.execute(sql1, tuple(part))
             tb_review=cursor.fetchall()
@@ -463,7 +464,7 @@ def fail_sendEmail(err):
 
 def today_path():
     '''backup folder create'''
-    folder_path=os.getcwd()+'/etc/result_data'
+    folder_path=os.getcwd()+'/etc/result'
     #folder_path=os.getcwd()+'\\etc\\result_data'
     today_path=os.path.join(folder_path,today)
     if not os.path.exists(today_path):

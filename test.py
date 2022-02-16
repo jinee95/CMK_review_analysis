@@ -5,10 +5,10 @@ from keys.key import *
 
 # 에러 테스트
 
-import time
-import os
-import traceback
-from datetime import datetime
+#import time
+#import os
+#import traceback
+#from datetime import datetimed
 from etc.log import error_time
 #err=''
 
@@ -26,28 +26,28 @@ from etc.log import error_time
 #         return self.value
 
 
-def ErrorLog(error: str):
-    now = datetime.now()
-    current_time = time.strftime("%Y.%m.%d/%H:%M:%S", time.localtime(time.time()))
-    now = now.strftime("%Y%m%d-%H-%M")
+# def ErrorLog(error: str):
+#     now = datetime.now()
+#     current_time = time.strftime("%Y.%m.%d/%H:%M:%S", time.localtime(time.time()))
+#     now = now.strftime("%Y%m%d-%H-%M")
 
-    with open(f"./etc/log/{now} Log.txt", "a") as f: # 경로설정
-        f.write(f"[{current_time}] - {error}\n")
+#     with open(f"./etc/log/{now} Log.txt", "a") as f: # 경로설정
+#         f.write(f"[{current_time}] - {error}\n")
 
-def test2():
-    #global err
-    #e = ''
-    # error=TestError()
-    try:
-        df=pd.read_csv('1123_test_copy.csv')
-        return df
-    except Exception as e:
-        error_content='error내용'
-        error.TestError(error_content)
-        print(e)
+# def test2():
+#     #global err
+#     #e = ''
+#     # error=TestError()
+#     try:
+#         df=pd.read_csv('1123_test_copy.csv')
+#         return df
+#     except Exception as e:
+#         error_content='error내용'
+#         error.TestError(error_content)
+#         print(e)
     #err = err+e
 
-df=test2()
+# df=test2()
 
 # def test():
 #     global err
@@ -104,9 +104,10 @@ df=test2()
 
 # 5-3.
 
-'''
-df2=pd.read_csv('1123_test.csv')
-df2_id=df2[['part_sub_id','part_id']]
+
+df2=pd.DataFrame({'PART_SUB_ID':['S01'],
+                   'PART_ID':['12562493972']})
+df2_id=df2[['PART_SUB_ID','PART_ID']]
 df2_id=df2_id.drop_duplicates(ignore_index=True)
 
 id_list=[]
@@ -114,9 +115,9 @@ for index, row in df2_id.iterrows():
     id_list.append(row.tolist())
 
 print(id_list)
-'''
-#anal03=total(id_list)
-#anal02=emo(id_list)
+
+#anal03=total(df2_id)
+anal02=emo(df2_id)
 
 
 ######################################################################
