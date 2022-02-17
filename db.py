@@ -208,20 +208,33 @@ def TB_property_id():
 
 # anal00의 part_id 리스트
 def anal00_part_id():
+    col=['PART_SUB_ID', 'PART_ID']
+    matching_id=pd.DataFrame(columns=col)
     try:
-        conn=conn_cp949
-        cursor=conn.corsur()
-        sql="select distinct PART_SUB_ID, PART_ID from TB_REVIEW_ANAL_00 (nolock)"
+        conn=conn_cp949()
+        cursor=conn.cursor()
+        sql="select distinct PART_ID from TB_REVIEW_ANAL_00 (nolock)"
         cursor.execute(sql)
         row=cursor.fetchall()
-        col_name=['PART_SUB_ID','PART_ID']
+        col_name=['part_id']
         df=pd.DataFrame(row,columns=col_name)
+
+        part_list = df['part_id'].values.tolist()
+        for part_id in part_list:
+            cursor=conn.cursor()
+            sql = "select distinct PART_SUB_ID from TB_REVIEW WHERE SITE_GUBUN='N' AND PART_ID = %s"    
+            cursor.execute(sql,(part_id))
+            row=cursor.fetchall()
+            col=['PART_SUB_ID']
+            sub_id_df = pd.DataFrame(row, columns=col)
+            sub_id_df['PART_ID']=part_id
+            matching_id=pd.concat([matching_id,sub_id_df],ignore_index=True)    
     except Exception as e:
         print("Error: ",e)
     finally:
         conn.close()
-    return df
-
+    return matching_id
+ 
 #### 키워드/센텐스 결과를 위한 리뷰 select
 def TB_join(df):
     print('db_data_loading for keyword/sentence')
@@ -234,6 +247,7 @@ def TB_join(df):
         cursor = conn.cursor()
 
         for i,part in df.iterrows():
+
             sql1="select SITE_GUBUN, PART_GROUP_ID, PART_SUB_ID, PART_ID, REVIEW_DOC_NO, REVIEW from TB_REVIEW (nolock) where PART_SUB_ID=%s and PART_ID=%s"
             cursor.execute(sql1, tuple(part))
             tb_review=cursor.fetchall()
@@ -250,9 +264,9 @@ def TB_join(df):
         print("Error: ",e)
     finally:
         conn.close()
-    df=pd.merge(df_review_concat,anal00_concat,on=['REVIEW_DOC_NO','PART_ID'])
+    result=pd.merge(df_review_concat,anal00_concat,on=['REVIEW_DOC_NO','PART_ID'])
     # df_columns=site_gubun, part_group_id, part_sub_id, part_id, review_doc_no, review, rlt_value_03
-    return df
+    return result
 
 
 

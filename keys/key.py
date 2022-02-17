@@ -27,25 +27,30 @@ def total(df):
 
     df_id=df[['PART_SUB_ID','PART_ID']]
     df_id=df_id.drop_duplicates(ignore_index=True)
-
-    id_list=[]
-    for index, row in df_id.iterrows():
-        id_list.append(row.tolist())
+    join_time_start=time.time()
+    df_join =db.TB_join(df_id) #anal00과 review테이블 조인해서 가져옴
+    join_time_end = time.time()
     
+    dataframe_id = df_join[['PART_SUB_ID','PART_ID']]
+    df_id_list1 = dataframe_id.drop_duplicates(ignore_index=True)
+    df_id_list=df_id_list1.copy()
+
+    review_cnt = len(df_join)
+    id_cnt = len(df_id_list1)
+    
+
     total_time_start=time.time()
     review_count=0
-    #stopwords
+    # stopwords
     stopword=db.TB_stopwords()
 
-    for i in id_list: # id_list=[[sub_id,part_id],[sub_id,part_id]]
-        sub_id=i[0]
-        part_id=i[1]
+    for idx in range (len(df_id_list)):
 
-        df_per_part_id=df[(df['PART_SUB_ID']==sub_id) & (df['PART_ID']==part_id)]     
-        
-        df_per_part_id = db.TB_join(df_per_part_id)
-        df_per_part_id['REVIEW'] = df_per_part_id['REVIEW'].str.replace(pat=r'[^\w\s]', repl=r' ', regex=True)
- 
+        sub_id = df_id_list.iloc[idx,0]
+        part_id = df_id_list.iloc[idx,1]
+        df_per_part_id = df_join[(df_join['PART_SUB_ID']==sub_id) & (df_join['PART_ID']==part_id)]
+        #df_per_part_id['REVIEW'] = df_per_part_id['REVIEW'].str.replace(pat=r'[^\w\s]', repl=r' ', regex=True)
+
         print(df_per_part_id)
         
         site=df_per_part_id.iloc[0,0]
@@ -156,8 +161,9 @@ def total(df):
     now=datetime.now().strftime('%y%m%d_%H%M')
     total_time_end=time.time()
     total_time=total_time_end-total_time_start
+    join_time=join_time_end-join_time_start
     # 분석날짜, 분류(total/emo), 분석제품수, 총 리뷰수, 분석시간
-    time_list=[now,"total_key",len(id_list),review_count,total_time]
+    time_list=[now,"total_key",id_cnt,review_cnt,total_time,join_time]
     
     # save
     db.time_txt(time_list,f'{today_path}/time_check')
@@ -176,27 +182,31 @@ def emo(df):
 
     df_id=df[['PART_SUB_ID','PART_ID']]
     df_id=df_id.drop_duplicates(ignore_index=True)
+    join_time_start=time.time()
+    df_join =db.TB_join(df_id) #anal00과 review테이블 조인해서 가져옴
+    join_time_end = time.time()
 
-    id_list=[]
-    for index, row in df_id.iterrows():
-        id_list.append(row.tolist())
-    
+    dataframe_id = df_join[['PART_SUB_ID','PART_ID']]
+    df_id_list1 = dataframe_id.drop_duplicates(ignore_index=True)
+    df_id_list=df_id_list1.copy()
+
+
+    id_cnt = len(df_id_list1)
+
     emo_time_start=time.time()
     review_count=0
     # stopwords
     stopword=db.TB_stopwords()
 
-    for i in id_list: # id_list=[[sub_id,part_id],[sub_id,part_id]]
-        sub_id=i[0]
-        part_id=i[1]
+    for idx in range (len(df_id_list)): # df_id_list=pd.DataFrame[sub_id,part_id]
         
         # review+anal00 join data
         # df_columns=site_gubun, part_group_id, part_sub_id, part_id, review_doc_no, review, rlt_value_03
         # df=db.TB_join(sub_id,part_id)
 
-        df_per_part_id=df[(df['PART_SUB_ID']==sub_id) & (df['PART_ID']==part_id)]
-        df_per_part_id = db.TB_join(df_per_part_id)
-        df_per_part_id['REVIEW'] = df_per_part_id['REVIEW'].str.replace(pat=r'[^\w\s]', repl=r' ', regex=True)
+        sub_id = df_id_list.iloc[idx,0]
+        part_id = df_id_list.iloc[idx,1]
+        df_per_part_id = df_join[(df_join['PART_SUB_ID']==sub_id) & (df_join['PART_ID']==part_id)]
 
         site=df_per_part_id.iloc[0,0]
         part_group_id=df_per_part_id.iloc[0,1]
@@ -409,8 +419,9 @@ def emo(df):
     now=datetime.now().strftime('%y%m%d_%H%M')
     emo_total_end=time.time()
     emo_total_time=emo_total_end-emo_time_start
-    # 분석날짜, 분류(total/emo), 분석제품수, 총 리뷰수, 분석시간
-    time_list=[now, "emo",len(id_list),review_count,emo_total_time]
+    join_total_time=join_time_end-join_time_start
+    # 분석날짜, 분류(total/emo), 분석제품수, 총 리뷰수, 분석시간, 리뷰합치는 시간
+    time_list=[now, "emo",id_cnt,review_count,emo_total_time,join_total_time]
 
     # save
     db.time_txt(time_list,f'{today_path}/time_check')
