@@ -42,8 +42,7 @@ def total(df):
 
         sub_id = df_id_list.iloc[idx,0]
         part_id = df_id_list.iloc[idx,1]
-        df_per_part_id = df[(df['PART_SUB_ID']==s
-        ub_id) & (df['PART_ID']==part_id)]
+        df_per_part_id = df[(df['PART_SUB_ID']==sub_id) & (df['PART_ID']==part_id)]
         #df_per_part_id['REVIEW'] = df_per_part_id['REVIEW'].str.replace(pat=r'[^\w\s]', repl=r' ', regex=True)
         
         site=df_per_part_id.iloc[0,0]
@@ -178,10 +177,10 @@ def emo(df):
     df_id_list=df_id_list1.copy()
 
 
-    id_cnt = len(df_id_list1)
+    id_cnt = len(df_id_list) # 상품개수
 
     emo_time_start=time.time()
-    review_count=0
+    review_count=0          #총 리뷰 개수
     # stopwords
     stopword=db.TB_stopwords()
 
@@ -406,9 +405,8 @@ def emo(df):
     now=datetime.now().strftime('%y%m%d_%H%M')
     emo_total_end=time.time()
     emo_total_time=emo_total_end-emo_time_start
-    join_total_time=join_time_end-join_time_start
     # 분석날짜, 분류(total/emo), 분석제품수, 총 리뷰수, 분석시간, 리뷰합치는 시간
-    time_list=[now, "emo",id_cnt,review_count,emo_total_time,join_total_time]
+    time_list=[now, "emo",id_cnt,review_count,emo_total_time]
 
     # save
     db.time_txt(time_list,f'{today_path}/time_check')
