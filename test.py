@@ -38,12 +38,13 @@ from db import *
 #     # df_columns=site_gubun, part_group_id, part_sub_id, part_id, review_doc_no, review, rlt_value_03
 #     return result
 
-df = anal00_part_id()
-print(df)
-#df = pd.read_csv('part_list.csv')
-#df = df.astype('string')
+anal00_df = anal00()
+not_anal_df = TB_join(anal00_df)
+print(not_anal_df)
 
-anal03=total(df)
+#anal03=total(not_anal_df)
+#print(anal03)
+anal02=emo(not_anal_df)
 # # 에러 테스트
 
 # #import time
@@ -136,7 +137,6 @@ anal03=total(df)
 # # # 5-1. ['part_sub_id','part_id'] list
 # # df_id=df[['part_sub_id','part_id']]
 # # df_id=df_id.drop_duplicates(ignore_index=True)
-
 # # id_list=[]
 # # for index, row in df_id.iterrows():
 # #     id_list.append(row.tolist())
