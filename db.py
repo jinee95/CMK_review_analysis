@@ -207,40 +207,16 @@ def TB_property_id():
         conn.close()
     return df_dict
 
-<<<<<<< Updated upstream
 
 def anal00() :
-=======
-# anal00의 part_id 리스트
-def anal00_part_id():
-    col=['PART_ID']
-    #col=['PART_SUB_ID', 'PART_ID']
-    matching_id=pd.DataFrame(columns=col)
->>>>>>> Stashed changes
     try:
         conn = conn_cp949()
         cursor=conn.cursor()
         sql = "select distinct PART_ID,REVIEW_DOC_NO, RLT_VALUE_03 from TB_REVIEW_ANAL_00 (nolock)"
         cursor.execute(sql)
         row=cursor.fetchall()
-<<<<<<< Updated upstream
         col_name=['PART_ID','REVIEW_DOC_NO','RLT_VALUE_03']
         anal00 = pd.DataFrame(row,columns=col_name)
-=======
-        col_name=['part_id']
-        df=pd.DataFrame(row,columns=col_name)
-
-        part_list = df['part_id'].values.tolist()
-        for part_id in part_list:
-            cursor=conn.cursor()
-            sql = "select distinct PART_SUB_ID from TB_REVIEW WHERE SITE_GUBUN='N' AND PART_ID = %s"
-            cursor.execute(sql,(part_id))
-            row=cursor.fetchall()
-            col=['PART_SUB_ID']
-            sub_id_df = pd.DataFrame(row, columns=col)
-            sub_id_df['PART_ID']=part_id
-            matching_id=pd.concat([matching_id,sub_id_df],ignore_index=True)    
->>>>>>> Stashed changes
     except Exception as e:
         print("Error: ",e)
     finally:
@@ -306,47 +282,10 @@ def TB_join(df):
         print("Error: ",e)
     finally:
         conn.close()
-<<<<<<< Updated upstream
 
     result=pd.merge(df_review_concat,df,how='outer',on=['PART_ID','REVIEW_DOC_NO'])
     # df_columns=site_gubun, part_group_id, part_sub_id, part_id, review_doc_no, review, rlt_value_03
     return result 
-=======
-    result=pd.merge(df_review_concat,anal00_concat,on=['REVIEW_DOC_NO','PART_ID'])
-
-    # df_columns=site_gubun, part_group_id, part_sub_id, part_id, review_doc_no, review, rlt_value_03
-    return result
-
-#### 키워드/센텐스 결과를 위한 리뷰 select
-def TB_join():
-    print('db_data_loading for keyword/sentence')
-    try:
-        review_col_name=["SITE_GUBUN","PART_GROUP_ID","PART_SUB_ID","PART_ID","REVIEW_DOC_NO","REVIEW"]
-        df_review_concat=pd.DataFrame(columns=review_col_name)
-        anal00_col_name=["REVIEW_DOC_NO","PART_ID","RLT_VALUE_03"]
-        anal00_concat=pd.DataFrame(columns=anal00_col_name)
-        conn=conn_cp949()
-        cursor = conn.cursor()
-        sql1="select SITE_GUBUN, PART_GROUP_ID, PART_SUB_ID, PART_ID, REVIEW_DOC_NO, REVIEW from TB_REVIEW (nolock) where PART_SUB_ID=%s and PART_ID=%s"
-        cursor.execute(sql1, tuple(part))
-        tb_review=cursor.fetchall()
-        df_review=pd.DataFrame(tb_review, columns=review_col_name)
-        df_review_concat=pd.concat([df_review_concat,df_review])
-            
-            sql2="select REVIEW_DOC_NO, PART_ID, RLT_VALUE_03 from TB_REVIEW_ANAL_00 (nolock) where PART_ID=%s"
-            cursor.execute(sql2, (part_id))
-            row=cursor.fetchall()
-            df_anal00=pd.DataFrame(row, columns=anal00_col_name)
-            anal00_concat=pd.concat([anal00_concat,df_anal00])
-    except Exception as e:
-        print("Error: ",e)
-    finally:
-        conn.close()
-    result=pd.merge(df_review_concat,anal00_concat,on=['REVIEW_DOC_NO','PART_ID'])
-
-    # df_columns=site_gubun, part_group_id, part_sub_id, part_id, review_doc_no, review, rlt_value_03
-    return result
->>>>>>> Stashed changes
 
 
 '''DB insert'''
