@@ -5,6 +5,7 @@ import db
 from keys.key import *
 import argparse, os, time, traceback
 from datetime import datetime
+import glowpic
 
 today=datetime.now().strftime('%Y%m%d')
 
@@ -52,6 +53,23 @@ def analysis():
     finish_time=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print(f"{finish_time} 분석 완료")
 
+def data_split():
+    try: 
+        start_time = time.time()
+        # split할 폴더생성
+        if not os.path.isdir("C:/glowpic_sentences"):
+                os.makedirs("C:/glowpic_sentences")
+
+        # split하기 전 데이터 3000개씩 나눔
+        glowpic.split_before()
+        # 3000개씩 나눈 데이터를 이용하여 split 및 레이블링기준포함여부
+        glowpic.split_after()
+
+        end_time = (time.time() - start_time)/60
+        print('문장 split 및 레이블링기준포함여부 완료 --- {0:0.2f} 분 소요'.format(end_time))
+    except Exception as e:
+        print(e)
+
 if __name__=='__main__':
     error_list=[]
     time_list=[]
@@ -59,6 +77,7 @@ if __name__=='__main__':
 
     try:
         start_time=time.time()
+        data_split()
         analysis()
         end_time=time.time()
         all_time=end_time-start_time
